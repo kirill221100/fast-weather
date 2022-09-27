@@ -14,6 +14,8 @@ templates = Jinja2Templates(directory='templates')
 @router.get('/')
 async def main_get(request: Request):
     if request.session.get('city'):
+        if not request.session.get('mes_sys'):
+            request.session['mes_sys'] = cfg.mes_sys['metric']
         data = get_weather_data(request.session.get('city'), request.session.get('mes_sys'))
         if not data:
             request.session.pop('city')
@@ -26,7 +28,10 @@ async def main_get(request: Request):
                                                            'usd': cfg.usd,
                                                            'eur': cfg.eur,
                                                            'news': cfg.news})
-    return templates.TemplateResponse('weather.html', {'request': request})
+    return templates.TemplateResponse('weather.html', {'request': request,
+                                                       'usd': cfg.usd,
+                                                       'eur': cfg.eur,
+                                                       'news': cfg.news})
 
 
 @router.post('/')

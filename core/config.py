@@ -14,3 +14,5 @@ class Config:
     usd: float = None
     eur: float = None
     news: dict = None
+    redis_url: str = os.environ.get('REDIS_URL')
+    redis_password: str = os.environ.get('REDIS_PASSWORD')

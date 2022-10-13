@@ -18,7 +18,7 @@ app.add_middleware(SessionMiddleware, secret_key=cfg.SECRET_KEY)
 
 @app.on_event('startup')
 @repeat_every(seconds=600)
-def get_currency_and_news():
+async def get_currency_and_news():
     cfg.usd = round(
         requests.get(f'https://freecurrencyapi.net/api/v2/latest?apikey={cfg.CURRENCY_API}&base_currency=USD').json()
         ['data']['RUB'], 2)

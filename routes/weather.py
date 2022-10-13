@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import RedirectResponse
-from .utils.weather import get_weather_data
-from .forms.city_form import CityForm
-from .forms.settings_form import SettingsForm
+from routes.utils.weather import get_weather_data
+from routes.forms.city_form import CityForm
+from routes.forms.settings_form import SettingsForm
 from core.config import Config as cfg
 
 
@@ -13,10 +13,12 @@ templates = Jinja2Templates(directory='templates')
 
 @router.get('/')
 async def main_get(request: Request):
-    if request.session.get('city'):
-        if not request.session.get('mes_sys'):
-            request.session['mes_sys'] = cfg.mes_sys['metric']
-        data = get_weather_data(request.session.get('city'), request.session.get('mes_sys'))
+    city = request.session.get('city')
+    mes_sys = request.session.get('mes_sys')
+    if city:
+        if not mes_sys:
+            mes_sys = cfg.mes_sys['metric']
+        data = await get_weather_data(city, mes_sys)
         if not data:
             request.session.pop('city')
             return templates.TemplateResponse('weather.html',

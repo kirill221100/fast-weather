@@ -5,7 +5,7 @@ from core.config import Config as cfg
 
 async def get_weather_data(city, mes_sys):
     result = await redis.get(city)
-    if result:
+    if result and json.loads(result)['mes_sys'] == mes_sys:
         result = json.loads(result)
         time = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(seconds=result['timezone']))).strftime("%H:%M")
         return result, mes_sys, time
@@ -16,6 +16,7 @@ async def get_weather_data(city, mes_sys):
     async with aiohttp.ClientSession() as request:
         async with request.get(url) as r:
             result = await r.json()
+            result['mes_sys'] = mes_sys
     if result['cod'] == '404':
         return None
     await redis.set(name=city, value=json.dumps(result), ex=3600)
